@@ -1,40 +1,70 @@
+require "./vector2d.rb"
 $population = 0
-class Fish
 
+class Fish
+  attr_accessor :pos_vec,:vel_vec,:acc_vec
   @@images = Array[Gosu::Image.new("img/blue_fish.png", :tileable => true),
                    Gosu::Image.new("img/yellow_fish.png", :tileable => true),
                    Gosu::Image.new("img/red_fish.png", :tileable => true)]
+  @@MAX_FORCE = 0.2
+  @@MAX_SPEED = 4
   def initialize()
-
     @image = @@images[rand(3)]
-    @x = @y = @velocityX = @velocityY = @accX = @accY = @rot = 0
-    #position vector , velocity vector and acc vector
+    @pos_vec = Vector2.new(rand()*800,rand()*600)
+    @vel_vec = Vector2.new((10*rand()-5)/100,(10*rand()-5)/100)
+    @vel_vec.magnitude = 4
+    @acc_vec = Vector2.new((10* rand()-5)/1000,(10*rand()-5)/1000)
     $population += 1
-    warp(rand(640),rand(480))
-  end
-
-  def warp(x,y)
-    # randomNum = (b-a)* rand() + a this generates between a and b
-    # we have used as a = -10 and b = 8
-    #
-    @x,@y = x,y
-    @velocityX = 18 * rand() - 10
-    @velocityY = 18 * rand() - 10
   end
 
   def update()
-    @x += @velocityX
-    @y += @velocityY
-    @velocityX += @accX
-    @velocityY += @accY
-    if @x<0 or @x>640 and @y<0 or @y>480
-      #@x = 320
-      #@y = 240
-    end
+    mirror()
+    @pos_vec = @pos_vec + @vel_vec
+    @vel_vec = @vel_vec + @acc_vec
   end
 
   def draw()
-    @image.draw(@x, @y, 0, scale_x = 0.35 , scale_y = 0.35)
+    @image.draw(@pos_vec.x, @pos_vec.y, 0, scale_x = 0.35 , scale_y = 0.35)
+  end
+
+  def mirror()
+    if @pos_vec.x > 800
+      @pos_vec.x = 0
+    elsif @pos_vec.x < 0
+      @pos_vec.x = 800
+    end
+    if @pos_vec.y > 600
+      @pos_vec.y = 0
+    elsif @pos_vec.y < 0
+      @pos_vec.y = 600
+    end
+  end
+
+  def align(fishes)
+    perceptionRadius = 50
+    steeringForce = Vector2.new(0,0)
+    fishesAround = 0
+    fishes.each do |other|
+      distance = self.pos_vec.distance(other.pos_vec)
+      if other != self and distance < perceptionRadius
+        steeringForce = steeringForce + other.vel_vec
+        fishesAround += 1
+      end
+    end
+    if fishesAround > 0
+      steeringForce = steeringForce.set!(steeringForce.x / fishesAround ,steeringForce.y / fishesAround)
+      steeringForce.magnitude = @@MAX_SPEED
+      steeringForce = steeringForce - self.vel_vec
+      if steeringForce.magnitude > @@MAX_FORCE
+        steeringForce.magnitude = @@MAX_FORCE
+      end
+    end
+    return steeringForce
+  end
+
+  def flock(fishes)
+    alignment = align(fishes)
+    @acc_vec = alignment
   end
 
   def getPopulation()

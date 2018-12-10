@@ -3,7 +3,7 @@ require "./fish.rb"
 
 class Main < Gosu::Window
   def initialize
-    super 640,480
+    super 800,600
     self.caption = "Flocking Fishes Simulation"
     @fishes = Array.new
 
@@ -34,6 +34,8 @@ class Main < Gosu::Window
     end
 
     for i in 0...$population
+      #@fishes[i].mirror()
+      @fishes[i].flock(@fishes)
       @fishes[i].update()
     end
   end
@@ -41,6 +43,7 @@ class Main < Gosu::Window
   def draw
     for i in 0...$population
       @fishes[i].draw()
+
     end
 
   end
