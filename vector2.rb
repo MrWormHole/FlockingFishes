@@ -1,4 +1,4 @@
-#
+#++
 # Copyright (C) 2008-2010  John Croisant
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -302,10 +302,6 @@ class Vector2
     Math.hypot( @x, @y )
   end
 
-  def distance(vector)
-    Math.sqrt((@x - vector.x)**2 + (@y - vector.y)**2)
-  end
-
 
   # Sets the vector's magnitude (distance). The vector keeps the
   # same angle as before.
@@ -433,6 +429,7 @@ class Vector2
     @hash = nil
     self
   end
+
   alias :normalize! :unit!
 
   # Like #unit!, but returns a new vector.
@@ -442,6 +439,22 @@ class Vector2
 
   alias :normalized :unit
 
+  # Returns distance between 2 vectors
+  def distance(vector)
+    Math.sqrt((@x-vector.x)**2 + (@y-vector.y)**2)
+  end
+
+  # Returns  copy of this vector
+  def copy
+    self.class.new(@x,@y)
+  end
+
+  # Limits vector's magnitude by a maximum value
+  def limit(maximum)
+    mag_squared = magnitude ** 2
+    return copy if mag_squared <= maximum**2
+    return unit! * maximum
+  end
 
   private
 
