@@ -25,7 +25,6 @@
 #
 class Vector2
   include Enumerable
-  #include MinMaxHelpers
 
   RAD_TO_DEG = 180.0 / Math::PI
   DEG_TO_RAD = Math::PI / 180.0
@@ -197,7 +196,7 @@ class Vector2
   #
   def ==( vector )
     return false if vector.nil?
-    _nearly_equal?(@x, vector.at(0)) and _nearly_equal?(@y, vector.at(1))
+    Vector2.vector_nearly_equal?(self, vector)
   end
 
 
@@ -217,8 +216,9 @@ class Vector2
 
   alias :at :[]
 
-
-  def hash # :nodoc:
+  # Two objects refer to the same hash key when their hash value is identical and
+  # two objects are equal? to each other.By default seperate instances refer to seperate hash keys.
+  def hash
     @hash ||= [@x, @y, self.class].hash
   end
 
@@ -439,6 +439,27 @@ class Vector2
 
   alias :normalized :unit
 
+  def self.expect(vector)
+    raise "expected type of Vector2, got #{vector.inspect}" unless vector.is_a?(Vector2)
+    vector
+  end
+
+  # Check whether vectors are same according to toleranceRate.By default tolerances are set to 10 ** -10 = 0.0000000001
+  def self.vector_nearly_equal?(first_vector,second_vector,toleranceRateForMagnitude = 1E-10,toleranceRateForAngle = 1E-10)
+    return (magnitude_nearly_equal?(first_vector,second_vector,toleranceRateForMagnitude) and
+            angle_nearly_equal?(first_vector,second_vector,toleranceRateForAngle))
+  end
+
+  # Check whether vectors' magnitude are same according to toleranceRate
+  def self.magnitude_nearly_equal?(first_vector,second_vector,toleranceRate)
+    return (first_vector-second_vector).magnitude <= toleranceRate
+  end
+
+  # Check whether vectors' angle(!NOT DEGREES! it is radian) are same according to toleranceRate
+  def self.angle_nearly_equal?(first_vector,second_vector,toleranceRate)
+    return (first_vector-second_vector).angle.abs <= toleranceRate
+  end
+
   # Returns distance between 2 vectors
   def distance(vector)
     Math.sqrt((@x-vector.x)**2 + (@y-vector.y)**2)
@@ -454,12 +475,6 @@ class Vector2
     mag_squared = magnitude ** 2
     return copy if mag_squared <= maximum**2
     return unit! * maximum
-  end
-
-  private
-
-  def _nearly_equal?( a, b, threshold=1E-10 ) # :nodoc:
-    (a - b).abs <= threshold
   end
 
 end
