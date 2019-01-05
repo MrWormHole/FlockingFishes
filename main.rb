@@ -5,8 +5,12 @@ class Main < Gosu::Window
   def initialize
     super 800,600
     self.caption = "Flocking Fishes Simulation"
+    createFishes(100)
+  end
+
+  def createFishes(n)
     @fishes = Array.new
-    for i in 0...100
+    for i in 0...n
       @fishes[i] = Fish.new
     end
   end

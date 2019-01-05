@@ -1,4 +1,3 @@
-#++
 # Copyright (C) 2008-2010  John Croisant
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,7 +21,7 @@
 # The Vector2 class implements two-dimensional vectors.
 # It is used to represent positions, movements, and velocities
 # in 2D space.
-#
+
 class Vector2
   include Enumerable
 

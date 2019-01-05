@@ -15,7 +15,6 @@ class Fish
     @vel_vec.magnitude = 4
     @acc_vec = Vector2.new((10* rand()-5)/1000,(10*rand()-5)/1000)
     @angle = 0
-    @last_angle = 0
     $population += 1
   end
 
@@ -24,15 +23,15 @@ class Fish
     @pos_vec = @pos_vec + @vel_vec
     @vel_vec = @vel_vec + @acc_vec
     #puts "vel_vec angle: #{vel_vec.angle_deg} | pos_vec angle: #{pos_vec.angle_deg} | #{@angle}"
-    #rotate()
+    # rotate very buggy and optimization will be needed
     @vel_vec.limit(@@MAX_SPEED)
     @acc_vec = @acc_vec * 0
   end
 
   def rotate
-    if @angle < @vel_vec.angle_deg + 180 and vel_vec.angle_deg < 0
+    if @angle < @vel_vec.angle_deg + 180 and @vel_vec.angle_deg < 0
       @angle += 4
-    elsif @angle > @vel_vec.angle_deg - 180 and vel_vec.angle_deg > 0
+    elsif @angle > @vel_vec.angle_deg - 180 and @vel_vec.angle_deg > 0
       @angle -= 4
     end
   end
